@@ -1,0 +1,11 @@
+@PACKAGE_INIT@
+
+set(_my_math_supported_components Addition Division)
+
+foreach(_comp ${my_math_FIND_COMPONENTS})
+  if (NOT _comp IN_LIST _my_math_supported_components)
+    set(my_math_FOUND False)
+    set(my_math_NOT_FOUND_MESSAGE "Unsupported component: ${_comp}")
+  endif()
+  include("${CMAKE_CURRENT_LIST_DIR}/my_math${_comp}-config.cmake")
+endforeach()

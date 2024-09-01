@@ -1,0 +1,8 @@
+- 一个install(EXPORT..)安装的target是find_package，以及COMPONENT的基本操作单元
+  - 在install(EXPORT..)时不要直接使用CMAKE_INSTALL_PREFIX，而是使用GNUInstallDirs带来的变量，不然cmake生成的*.cmake文件会包含绝对路径，安装的包不可移动
+  - target_include_directories中的INSTALL_INTERFACE，要跟install(FILES..)中安装的头文件的路径匹配，前者用于指定target在被下游使用时的INTERFACE_INCLUDE_DIRECTORIES属性值；后者是头文件的实际安装路径
+  - 即便不支持使用find_package以及COMPONENT，install(EXPORT..)安装生成的包，也可以通过手动在下游使用者那里直接include(../*.cmake)的形式直接使用
+    - 其实，find_package的本质就是自动发现这个文件，然后也还是调用include(..); COMPONENT是find_package的细化，只不过在pakage下面的COMPONENT颗粒度上，还是include对应COMPONENT的*-config.cmake文件；无论是一整个package还是将其分成更细粒度的COMPONENT，都是上面提到的使用install(EXPORT ..)命令安装的target
+- 如果要使用find_package动态发现package，则需要使用CMakePackageConfigHelpers中的write_basic_package_version_file和configure_package_config_file两个macro，会生成[pkg_name]Config.cmake和[pkg_name]ConfigVersion.cmake，并且要使用install将这两个文件安装
+- 所谓的COMPONENT就是在Config.cmake.in中定义好支持的所有的export的target，然后cmake会根据Config.cmake.in生成查找COMPONENT的脚本
+  - 在find_package中指定COMPONENT名称时，在[pkg_name]Config.cmake中cmake会将COMPONENT名称转换为对应的export target的*-config.cmake名称，然后直接include(..)这个文件

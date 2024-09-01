@@ -42,9 +42,50 @@ install(
 
 install(
     EXPORT my_export 
-    FILE my_math-config.cmake 
+    FILE my_math-config.cmake
+    NAMESPACE MyMath::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/my_math/cmake)
     # 避免使用CMAKE_INSTALL_PREFIX，生成的my_math-config.cmake中的_IMPORT_PREFIX是绝对路径，not relocatable
     # 使用GNUInstallDirs中的CMAKE_INSTALL_LIBDIR，cmake会在生成物中计算相对路径，让生成的install内容relocatable
     # DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/my_math)
+
+##########################################################################################################
+# 注意：
+# 以上内容可以实现在下游用户那里使用include(..)的方式使用export的target，例如：
+# include("/home/swq/work/cmake/Master_CMake_for_Cross-Platform_C++_Project_Building_update_06Dec2020/m7l3_Exporting_a_Package/build/install/lib/my_math/cmake/my_math-config.cmake")
+# 以上的一个export的target是下面find_package以及后续COMPONENT的基本操作target
+
+# 但是不能支持使用find_package(..)，以下的内容增加对find_package(..)的使用支持
+# 增加find_package的支持后，原来的include(..)的使用方式仍然不变，依然可以使用
+##########################################################################################################
+
+include(CMakePackageConfigHelpers)
+
+# set version
+set(version 3.4.1)
+
+set_property(TARGET my_math PROPERTY VERSION ${version})
+set_property(TARGET my_math PROPERTY SOVERSION 3)
+set_property(TARGET my_math PROPERTY
+  INTERFACE_my_math_MAJOR_VERSION 3)
+set_property(TARGET my_math APPEND PROPERTY
+  COMPATIBLE_INTERFACE_STRING my_math_MAJOR_VERSION
+)
+
+# generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/my_mathConfigVersion.cmake"
+  VERSION "${version}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+    "${CMAKE_CURRENT_BINARY_DIR}/my_mathConfig.cmake"
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/my_math/cmake)
+
+install(FILES 
+    "${CMAKE_CURRENT_BINARY_DIR}/my_mathConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/my_mathConfigVersion.cmake"
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/my_math/cmake)
+
 
