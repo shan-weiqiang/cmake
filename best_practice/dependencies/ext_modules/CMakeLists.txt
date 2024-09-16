@@ -1,0 +1,5 @@
+FetchContent_GetProperties(ext_modules)
+if(NOT ext_modules_POPULATED)
+    FetchContent_Populate(ext_modules)
+    list(APPEND CMAKE_MODULE_PATH ${ext_modules_SOURCE_DIR}/cmake)
+endif()
