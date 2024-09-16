@@ -16,14 +16,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 # Any dependent pacakges
-add_subdirectory(dependencies)
+add_subdirectory(dep)
 
 # Current project source
 add_subdirectory(src)
 
 # Things only needed if this is top level project
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
-    add_subdirectory(tests)
-    add_subdirectory(packaging)
+    add_subdirectory(test)
+    add_subdirectory(pkg)
 endif()
-
