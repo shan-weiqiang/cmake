@@ -1,0 +1,1 @@
+- This project demonstrate the best practice for using cmake
