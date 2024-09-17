@@ -1,0 +1,2 @@
+- This project consists of three libs: divide, multi and caculator. Caculator depends on divide and multi. When end users use caculator, divide and multi libraries have to be available using `find_pacakge`, we have to implement this relationship using cmake
+- multi and divide should be exported as individual libs and should support being used individually

@@ -3,3 +3,7 @@
 # here, since functions and macros have global visibility
 say_yes()
 
+add_subdirectory(multi)
+add_subdirectory(divide)
+add_subdirectory(caculator)
+

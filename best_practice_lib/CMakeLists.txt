@@ -11,6 +11,8 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 # Include local helper functions and macros
 include(BpHelpers)
 
+include(GNUInstallDirs)
+
 # Just "use if available" recommandation
 set(CMAKE_CXX_STANDARD 14)
 # Force to use values set by CMAKE_CXX_STANDARD, else error at configuration time
