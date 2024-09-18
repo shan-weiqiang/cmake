@@ -13,7 +13,7 @@ add_executable(app app.cpp)
 list(PREPEND CMAKE_PREFIX_PATH 
     ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake
     # external pkg
-    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/lib/foonathan_memory/cmake
+    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/lib
     )
 
 list_imported_targets()
