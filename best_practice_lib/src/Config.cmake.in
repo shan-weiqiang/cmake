@@ -43,7 +43,7 @@ foreach(comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_comps)
     # ${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_<comp> will be true if the component is specified
     # as REQUIRED in find_package
     if(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${comp} AND
-        NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${comp}Config.cmake)
+        NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${comp}/${comp}Config.cmake)
         # Both the find result and message should be passed to find_package for handling, instead of
         # handle them inside this file
         set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "bp missing required dependency: ${comp}")
@@ -56,5 +56,9 @@ foreach(comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_comps)
     # At this point, all REQUIRED components are known to exist. We can safely include
     # their config files. For other components we have not checked their config file
     # existence, so the OPTIONAL parameter bypass this situation if their config file does not exist.
-    include(${CMAKE_CURRENT_LIST_DIR}/${comp}Config.cmake OPTIONAL)
+
+    # Note that the path here should be consistent with:
+    # 1. INSTALL_DESTINATION parameter in configure_package_config_file command
+    # 2. DESTINATION parameter in install command when install config file
+    include(${CMAKE_CURRENT_LIST_DIR}/${comp}/${comp}Config.cmake OPTIONAL)
 endforeach()

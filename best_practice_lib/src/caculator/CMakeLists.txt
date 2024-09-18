@@ -31,7 +31,7 @@ install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/caculator
     )
 
 install(EXPORT SINGLE_COMP_EXPORT
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/Caculator
     NAMESPACE Math::
     FILE CaculatorConfig.cmake
     )

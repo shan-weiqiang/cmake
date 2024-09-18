@@ -39,7 +39,12 @@ add_subdirectory(caculator)
 
 # MULTI_COMP_MATH is installed here since multi and divide target both belongs to it
 install(EXPORT MULTI_COMP_MATH
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    # ${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}/cmake/Math will produce something like
+    # <install>/lib/cmake/<pkg>/<component>, this corresponds to
+    # pkg --> components --> targets hierarchy
+    # Note by specifying the export path, cmake will automatically generate
+    # the script to locate the position of the target using relative path
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/Math
     # This determines the name used in COMPONENTS parameter in find_package
     # for example: find_pakcage(<pkg name> <VERSION> REQUIRED COMPONENTS Math)
     FILE MathConfig.cmake
@@ -76,7 +81,7 @@ write_basic_package_version_file(
 configure_package_config_file(
     Config.cmake.in 
     bpConfig.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     # Those are macros that will be generated for us to manage components
     # Since we manage our components by ourself, those we do not need anymore
     NO_SET_AND_CHECK_MACRO
@@ -88,7 +93,7 @@ install(
     FILES 
         ${CMAKE_CURRENT_BINARY_DIR}/bpConfig.cmake 
         ${CMAKE_CURRENT_BINARY_DIR}/bpConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
     COMPONENT PKG
     )
 

@@ -21,7 +21,7 @@ install(
 
 install(
     EXPORT JSON
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/Json
     FILE JsonConfig.cmake
     NAMESPACE nlohmann::
     COMPONENT JSON
