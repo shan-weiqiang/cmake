@@ -5,13 +5,18 @@
 # The content should be manually managed by developer to handle components
 # inside this package and their dependencies.
 
-# ${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS represent the value in COMPONENTS
+# ${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS represent the value in COMPONENTS
 # parameter in find_pakcage command.
-if(${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS)
-    set(comps ${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS)
+if(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
+    set(comps ${${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS})
     # Since we know that Caculator depends on Math, handle it
     if(Caculator IN_LIST comps AND NOT Math IN_LIST comps)
-        list(APPEND comps Math)
+        # Use PREPEND instead of APPEND, since we will include components in the
+        # order of this list, and targets will be imported in this step. If a
+        # component depend on another, the config file will check the existence 
+        # of the dependees  and if they are still not imported as IMPORTED_TARGETS
+        # at that time, there will be error
+        list(PREPEND comps Math)
     endif()
 else()
     # If no COMPONENTS parameter in find_pacakge, defautl to find all components
@@ -20,12 +25,12 @@ endif()
 
 # todo: handle dependencies; difference between find_dependency and find_package
 set(${CMAKE_FIND_PACKAGE_NAME}_comps ${comps})
-if(Math IN_LIST ${comps})
+if(Math IN_LIST comps)
     message(STATUS "TODO..")
 endif()
 
 
-foreach(comp IN_LIST ${CMAKE_FIND_PACKAGE_NAME}_comps)
+foreach(comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_comps)
     # ${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_<comp> will be true if the component is specified
     # as REQUIRED in find_package
     if(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${comp} AND
@@ -38,7 +43,7 @@ foreach(comp IN_LIST ${CMAKE_FIND_PACKAGE_NAME}_comps)
     endif()
 endforeach()
 
-foreach(comp IN_LIST ${CMAKE_FIND_PACKAGE_NAME}_comps)
+foreach(comp IN LISTS ${CMAKE_FIND_PACKAGE_NAME}_comps)
     # At this point, all REQUIRED components are known to exist. We can safely include
     # their config files. For other components we have not checked their config file
     # existence, so the OPTIONAL parameter bypass this situation if their config file does not exist.
