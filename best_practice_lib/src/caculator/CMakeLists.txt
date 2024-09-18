@@ -9,4 +9,24 @@ add_library(Math::Caculator ALIAS Caculator)
 include(GNUInstallDirs)
 target_include_directories(Caculator 
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-    PUBLIC $<INSTALL_INTERFACE: ${CMAKE_INSTALL_INCLUDEDIR})
+    PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+install(
+    TARGETS Caculator
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT CACULATOR
+    # This is a single target export that only contains one target
+    EXPORT SINGLE_COMP_EXPORT
+)
+
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/caculator
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT CACULATOR
+    FILES_MATCHING PATTERN "*.h"
+    )
+
+install(EXPORT SINGLE_COMP_EXPORT
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    NAMESPACE Math::
+    FILE CaculatorConfig.cmake
+    )

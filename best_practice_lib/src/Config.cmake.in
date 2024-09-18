@@ -1,0 +1,46 @@
+@PACKAGE_INIT@
+
+# This file will be preprocessed by configure_package_config_file into
+# <pkg>Config.cmake file, which will be processed by find_pakcage command.
+# The content should be manually managed by developer to handle components
+# inside this package and their dependencies.
+
+# ${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS represent the value in COMPONENTS
+# parameter in find_pakcage command.
+if(${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS)
+    set(comps ${CMAKE_FIND_PAKCAGE_NAME}_FIND_COMPONENTS)
+    # Since we know that Caculator depends on Math, handle it
+    if(Caculator IN_LIST comps AND NOT Math IN_LIST comps)
+        list(APPEND comps Math)
+    endif()
+else()
+    # If no COMPONENTS parameter in find_pacakge, defautl to find all components
+    set(comps Caculator Math)
+endif()
+
+# todo: handle dependencies; difference between find_dependency and find_package
+set(${CMAKE_FIND_PACKAGE_NAME}_comps ${comps})
+if(Math IN_LIST ${comps})
+    message(STATUS "TODO..")
+endif()
+
+
+foreach(comp IN_LIST ${CMAKE_FIND_PACKAGE_NAME}_comps)
+    # ${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_<comp> will be true if the component is specified
+    # as REQUIRED in find_package
+    if(${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED_${comp} AND
+        NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/${comp}Config.cmake)
+        # Both the find result and message should be passed to find_package for handling, instead of
+        # handle them inside this file
+        set(${CMAKE_FIND_PACKAGE_NAME}_NOT_FOUND_MESSAGE "bp missing required dependency: ${comp}")
+        set(${CMAKE_FIND_PACKAGE_NAME}_FOUND FALSE)
+        return()
+    endif()
+endforeach()
+
+foreach(comp IN_LIST ${CMAKE_FIND_PACKAGE_NAME}_comps)
+    # At this point, all REQUIRED components are known to exist. We can safely include
+    # their config files. For other components we have not checked their config file
+    # existence, so the OPTIONAL parameter bypass this situation if their config file does not exist.
+    include(${CMAKE_CURRENT_LIST_DIR}/${comp}Config.cmake OPTIONAL)
+endforeach()

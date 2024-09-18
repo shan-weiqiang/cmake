@@ -32,7 +32,9 @@ install(TARGETS multi
 )
 
 # Install multi headers. This can also be done using PUBLIC_HEADER property
-# of the target
+# of the target. Note that the actual install path(relative to CMAKE_INSTALL_DIR)
+# should be consistent with $<INSTALL_INTERFACE>, otherwise the consumer project
+# will not find header files correctly.
 install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/multi
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT MULTI

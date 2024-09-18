@@ -30,6 +30,12 @@ add_subdirectory(caculator)
 # 1. COMPONENT in install command is just a label to group different install content
 # 2. COMPONENTS in find_package is used to specify exports inside one package
 # 3. One export can contain multiple targets
+# 4. Package structure is as follow: pkg --> components --> targets
+#   pkg: manually managed in <pkg>Config.cmake file, which normally is generated through
+#       Config.cmake.in using configure_package_config_file macro
+#   components: correspond to export in cmake, <cmp>Config.cmake file will be generated
+#       automatically by cmake
+#   targets: will be imported inside <cmp>Config.cmake file
 
 # MULTI_COMP_MATH is installed here since multi and divide target both belongs to it
 install(EXPORT MULTI_COMP_MATH
@@ -54,4 +60,25 @@ install(EXPORT MULTI_COMP_MATH
     # then they can be installed individually.
     COMPONENT MATH
 )
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+# This generate package level <pkg>Config.cmake file
+configure_package_config_file(
+    Config.cmake.in 
+    bpConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    # Those are macros that will be generated for us to manage components
+    # Since we manage our components by ourself, those we do not need anymore
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO)
+
+# Above command only generate bpConfig.cmake file, but does not install it physically
+# It needs to be installed explicitly
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/bpConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
+    COMPONENT PKG
+    )
 
