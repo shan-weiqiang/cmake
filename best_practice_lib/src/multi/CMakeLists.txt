@@ -21,3 +21,20 @@ include(GNUInstallDirs)
 target_include_directories(multi
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include> 
     PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+
+# Install multi target. Note that MULTI_COMP_MATH is a multi component export
+# divide also use this export name, cmake will group these two components into
+# one *.cmake config file. 
+install(TARGETS multi
+    EXPORT   MULTI_COMP_MATH
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    COMPONENT MULTI  
+)
+
+# Install multi headers. This can also be done using PUBLIC_HEADER property
+# of the target
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/multi
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+    COMPONENT MULTI
+    FILES_MATCHING PATTERN "*.h"
+)
