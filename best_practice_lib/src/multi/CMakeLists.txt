@@ -1,7 +1,9 @@
 AddSharedLib(
     TARGET multi
     LOGGING
-    SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/multi.cpp)
+    SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/multi.cpp
+    PUB_DEPS nlohmann::json
+    )
 
 # Using namespace instead of target name directly, for two reasons:
 # 1. cmake treat :: as only target names, if those target names are

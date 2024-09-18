@@ -1,5 +1,7 @@
 @PACKAGE_INIT@
 
+######### This file should be manually managed by developer #########
+
 # This file will be preprocessed by configure_package_config_file into
 # <pkg>Config.cmake file, which will be processed by find_pakcage command.
 # The content should be manually managed by developer to handle components
@@ -9,6 +11,7 @@
 # parameter in find_pakcage command.
 if(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
     set(comps ${${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS})
+    # Handle intra-pkg dependencies
     # Since we know that Caculator depends on Math, handle it
     if(Caculator IN_LIST comps AND NOT Math IN_LIST comps)
         # Use PREPEND instead of APPEND, since we will include components in the
@@ -18,12 +21,17 @@ if(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
         # at that time, there will be error
         list(PREPEND comps Math)
     endif()
+    # Handle intra-pkg dependences for the Json component
+    if(Math IN_LIST comps AND NOT Json IN_LIST comps)
+        list(PREPEND comps Json)
+    endif()
 else()
     # If no COMPONENTS parameter in find_pacakge, defautl to find all components
-    set(comps Caculator Math)
+    # Note the components name are decided by FILE in install(EXPORT...) command
+    set(comps Caculator Math Json)
 endif()
 
-# todo: handle dependencies; difference between find_dependency and find_package
+# todo: handle extern-pkg dependencies; difference between find_dependency and find_package
 set(${CMAKE_FIND_PACKAGE_NAME}_comps ${comps})
 if(Math IN_LIST comps)
     message(STATUS "TODO..")

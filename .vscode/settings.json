@@ -1,4 +1,7 @@
 {
     "ros.distro": "humble",
-    "cmake.sourceDirectory": "/home/swq/work/cmake/best_practice"
+    "cmake.sourceDirectory": "/home/swq/work/cmake/best_practice",
+    "files.associations": {
+    "*.cmake.in": "cmake"
+}
 }
