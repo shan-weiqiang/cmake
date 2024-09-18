@@ -16,6 +16,9 @@ enable_testing()
 # useful modules defined for this project
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
+# External library search path
+list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/ext/lib/foonathan_memory/cmake)
+
 # Include local helper functions and macros
 include(BpHelpers)
 

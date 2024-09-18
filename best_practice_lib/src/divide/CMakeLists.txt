@@ -1,7 +1,12 @@
+# Find external pakcages
+find_package(foonathan_memory REQUIRED)
+
 AddSharedLib(
     TARGET divide
     LOGGING
-    SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/divide.cpp)
+    SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/divide.cpp
+    PUB_DEPS foonathan_memory
+    )
 
 add_library(Math::Divide ALIAS divide)
 

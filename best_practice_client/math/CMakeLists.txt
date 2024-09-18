@@ -10,7 +10,11 @@ macro(list_imported_targets)
 endmacro()
 
 add_executable(app app.cpp)
-list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake)
+list(PREPEND CMAKE_PREFIX_PATH 
+    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake
+    # external pkg
+    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/lib/foonathan_memory/cmake
+    )
 
 list_imported_targets()
 # Package name, component name are related to the config file name

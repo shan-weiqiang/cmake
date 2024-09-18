@@ -31,10 +31,11 @@ else()
     set(comps Caculator Math Json)
 endif()
 
-# todo: handle extern-pkg dependencies; difference between find_dependency and find_package
+# Handle extern-pkg dependencies
+include(CMakeFindDependencyMacro)
 set(${CMAKE_FIND_PACKAGE_NAME}_comps ${comps})
 if(Math IN_LIST comps)
-    message(STATUS "TODO..")
+    find_dependency(foonathan_memory)
 endif()
 
 
