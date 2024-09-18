@@ -5,6 +5,11 @@ AddSharedLib(
 
 add_library(Math::Divide ALIAS divide)
 
+set_target_properties(divide PROPERTIES
+    VERSION 3.2.1
+    SOVERSION 3
+)
+
 include(GNUInstallDirs)
 target_include_directories(divide
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include> 

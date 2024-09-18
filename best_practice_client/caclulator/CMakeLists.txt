@@ -15,7 +15,9 @@ list(PREPEND CMAKE_PREFIX_PATH ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build
 list_imported_targets()
 # Package name, component name are related to the config file name
 # This will import component Caculator and it's dependent components
-find_package(bp REQUIRED COMPONENTS Caculator)
+# Also the version number 2.1.0 will also be check to decides whether
+# the actual version meets the version specified here
+find_package(bp 2.1.0 EXACT COMPONENTS Caculator)
 list_imported_targets()
 
 # Target name namespace are related to the NAMESPACE in install(EXPORT...)

@@ -6,6 +6,11 @@ AddSharedLib(
 
 add_library(Math::Caculator ALIAS Caculator)
 
+set_target_properties(Caculator PROPERTIES
+    VERSION 3.2.1
+    SOVERSION 3
+)
+
 include(GNUInstallDirs)
 target_include_directories(Caculator 
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>

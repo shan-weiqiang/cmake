@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(bp)
+# Call project in the top level CMakeLists.txt just once(best practice)
+project(bp
+    # This version will be used by write_basic_package_version_file commands if
+    # it is called without VERSION specified
+    VERSION 1.1.0
+    LANGUAGES CXX
+    HOMEPAGE_URL https://github.com/shan-weiqiang/cmake/tree/main/best_practice_lib
+    DESCRIPTION "A project to demonstrate the best practice for using CMake"
+)
 
 enable_testing()
 # Do not use CMAKE_SORUCE_DIR to support our project be used NOT as top level project,

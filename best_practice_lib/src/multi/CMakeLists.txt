@@ -11,6 +11,14 @@ AddSharedLib(
 # 2. Using namespace can organize libs more clearly
 add_library(Math::Multi ALIAS multi)
 
+# Specify VERSION and SOVERSION for a SHARED lib target will make cmake
+# generate linux format soft links for *.so files. Note that this version
+# is not related to project version, or package version.
+set_target_properties(multi PROPERTIES
+    VERSION 3.2.1
+    SOVERSION 3
+)
+
 include(GNUInstallDirs)
 
 # Specify include folders for build time and export time

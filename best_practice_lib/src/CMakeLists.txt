@@ -64,6 +64,14 @@ install(EXPORT MULTI_COMP_MATH
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
+# This will create version config file, 
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/bpConfigVersion.cmake"
+ # If not specified, VERSION in project command will be used instead
+  VERSION 2.1.0
+  COMPATIBILITY AnyNewerVersion
+)
+
 # This generate package level <pkg>Config.cmake file
 configure_package_config_file(
     Config.cmake.in 
@@ -74,10 +82,12 @@ configure_package_config_file(
     NO_SET_AND_CHECK_MACRO
     NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
-# Above command only generate bpConfig.cmake file, but does not install it physically
+# Above command only generate bpConfig.cmake/bpConfigVersion.cmake file, but does not install it physically
 # It needs to be installed explicitly
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/bpConfig.cmake
+    FILES 
+        ${CMAKE_CURRENT_BINARY_DIR}/bpConfig.cmake 
+        ${CMAKE_CURRENT_BINARY_DIR}/bpConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake
     COMPONENT PKG
     )
