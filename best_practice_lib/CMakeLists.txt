@@ -31,6 +31,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 # Flag on compiler-specific extentions, like -std=gnu++14
 set(CMAKE_CXX_EXTENSIONS NO)
 
+# Make cmake modify RPATH for *.so to contain relative locations when targets are installed
+set(CMAKE_INSTALL_RPATH $ORIGIN)
+
 # Any dependent pacakges
 add_subdirectory(dep)
 
