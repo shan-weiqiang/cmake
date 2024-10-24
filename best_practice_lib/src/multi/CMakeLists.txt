@@ -37,6 +37,11 @@ target_include_directories(multi
 # one *.cmake config file. 
 install(TARGETS multi
     EXPORT   MULTI_COMP_MATH
+    # Here MUST use GNUInstallDirs variable CMAKE_INSTALL_LIBDIR to specify install
+    # path, the reason is that only by this way cmake will automatically caculate
+    # the correct _IMPORT_PREFIX in generated export files like *-targets.cmake
+    # otherwise, absolute path will be used, which makes the exported pacakge not
+    # relocatable.
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT MULTI  
 )
