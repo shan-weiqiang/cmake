@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 project(app)
 
 macro(list_imported_targets)
@@ -10,11 +10,20 @@ macro(list_imported_targets)
 endmacro()
 
 add_executable(app app.cpp)
-list(PREPEND CMAKE_PREFIX_PATH 
-    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake
-    # external pkg
-    ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/lib
-    )
+
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    list(PREPEND CMAKE_PREFIX_PATH 
+        ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake
+        # external pkg
+        ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/x86/lib
+        )
+else()
+    list(PREPEND CMAKE_PREFIX_PATH 
+        ${CMAKE_SOURCE_DIR}/../../best_practice_lib/build/install/lib/cmake
+        # external pkg
+        ${CMAKE_SOURCE_DIR}/../../best_practice_lib/ext/aarch64/lib
+        )
+endif()
 
 list_imported_targets()
 # Package name, component name are related to the config file name

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.21)
 
 # Call project in the top level CMakeLists.txt just once(best practice)
 project(bp
@@ -17,7 +17,11 @@ enable_testing()
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 
 # External library search path
-list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/ext/lib/foonathan_memory/cmake)
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "x86_64")
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/ext/x86/lib/foonathan_memory/cmake)
+else()
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/ext/aarch64/lib/foonathan_memory/cmake)
+endif()
 
 # Include local helper functions and macros
 include(BpHelpers)

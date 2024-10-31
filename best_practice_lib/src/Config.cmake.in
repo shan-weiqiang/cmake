@@ -11,7 +11,12 @@
 # parameter in find_pakcage command.
 if(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
     set(comps ${${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS})
-    # Handle intra-pkg dependencies
+    # Handle intra-pkg dependencies. Note the dependency chain
+    # We have to carefully handle this to ensure that correct
+    # components should be imported
+    if(Computer IN_LIST comps AND NOT Caculator IN_LIST comps)
+        list(PREPEND comps Caculator)
+    endif()
     # Since we know that Caculator depends on Math, handle it
     if(Caculator IN_LIST comps AND NOT Math IN_LIST comps)
         # Use PREPEND instead of APPEND, since we will include components in the
@@ -28,7 +33,7 @@ if(${CMAKE_FIND_PACKAGE_NAME}_FIND_COMPONENTS)
 else()
     # If no COMPONENTS parameter in find_pacakge, defautl to find all components
     # Note the components name are decided by FILE in install(EXPORT...) command
-    set(comps Caculator Math Json)
+    set(comps Caculator Math Json Computer)
 endif()
 
 # Handle extern-pkg dependencies

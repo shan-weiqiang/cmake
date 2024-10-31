@@ -6,6 +6,7 @@ say_yes()
 add_subdirectory(multi)
 add_subdirectory(divide)
 add_subdirectory(caculator)
+add_subdirectory(computer)
 
 # Install MULTI_COMP_MATH export. Note that MULTI_COMP_MATH is a multi target export
 # divide also use this export name, cmake will group these two targets into
@@ -47,6 +48,8 @@ install(EXPORT MULTI_COMP_MATH
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}/Math
     # This determines the name used in COMPONENTS parameter in find_package
     # for example: find_pakcage(<pkg name> <VERSION> REQUIRED COMPONENTS Math)
+    # Here the pattern is: <component_NAME>Config.cmake. COMPONENTS are directly
+    # related with *Config.cmake and EXPORT, they have 1-1-1 mapping relationship.
     FILE MathConfig.cmake
     # This determines the namespace used by consumers of targets that are inside
     # this export, for example we have divide and multi targets, they can be used
@@ -55,6 +58,13 @@ install(EXPORT MULTI_COMP_MATH
     # should be the same with the alias namespace. It has the benifit that the consumer
     # project can both use add_subdirectory(...) and find_pakcage(...) to use this
     # pakcage without need to change the target names.
+
+    # Besides, the target name after the NAMESPACE is ALWAYS the same both for build time
+    # and for at the user side. For example Math::divide, the 'divide' target name
+    # is decided when using command add_library(..), this name is used across build
+    # AND end usage. At the end usage, the user should use it with NAMESPACE prefixed:
+    # aka: Math::divide. Target name once declared can not be changed in the whole 
+    # life cycle.
     NAMESPACE Math::
     # This determines which install group these export files belongs to. It can
     # be specified in install command like: cmake --install build --component MATH
