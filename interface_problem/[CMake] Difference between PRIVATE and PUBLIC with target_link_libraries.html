@@ -1,0 +1,205 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0054)https://cmake.org/pipermail/cmake/2016-May/063400.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+   <title> [CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries
+   </title>
+   <link rel="Index" href="https://cmake.org/pipermail/cmake/2016-May/index.html">
+   <link rel="made" href="mailto:cmake%40cmake.org?Subject=Re%3A%20%5BCMake%5D%20Difference%20between%20PRIVATE%20and%20PUBLIC%20with%0A%09target_link_libraries&amp;In-Reply-To=%3CCA%2BdygY%3D342rwEpGn4btVZdqdBamGEBdBfQw0DaZsuTf_9L1JWw%40mail.gmail.com%3E">
+   <meta name="robots" content="index,nofollow">
+   <style type="text/css">
+       pre {
+           white-space: pre-wrap;       /* css-2.1, curent FF, Opera, Safari */
+           }
+   </style>When A links in B as *INTERFACE*, it is saying that A does not use B
+   in its implementation, but B is used in A's public API. Code that calls
+   into A may need to refer to things from B in order to make such calls. One
+   example of this is an interface library which simply forwards calls along
+   to another library but doesn't actually reference the objects on the way
+   through other than by a pointer or reference.
+   
+   <link rel="Previous" href="https://cmake.org/pipermail/cmake/2016-May/063399.html">
+   <link rel="Next" href="https://cmake.org/pipermail/cmake/2016-May/063401.html">
+ </head>
+ <body bgcolor="#ffffff">
+   <h1>[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries</h1>
+    <b>Craig Scott</b> 
+    <a href="mailto:cmake%40cmake.org?Subject=Re%3A%20%5BCMake%5D%20Difference%20between%20PRIVATE%20and%20PUBLIC%20with%0A%09target_link_libraries&amp;In-Reply-To=%3CCA%2BdygY%3D342rwEpGn4btVZdqdBamGEBdBfQw0DaZsuTf_9L1JWw%40mail.gmail.com%3E" title="[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries">craig.scott at crascit.com
+       </a><br>
+    <i>Wed May 11 07:58:34 EDT 2016</i>
+    <p></p><ul>
+        <li>Previous message: <a href="https://cmake.org/pipermail/cmake/2016-May/063399.html">[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries
+</a></li>
+        <li>Next message: <a href="https://cmake.org/pipermail/cmake/2016-May/063401.html">[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries
+</a></li>
+         <li> <b>Messages sorted by:</b> 
+              <a href="https://cmake.org/pipermail/cmake/2016-May/date.html#63400">[ date ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/thread.html#63400">[ thread ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/subject.html#63400">[ subject ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/author.html#63400">[ author ]</a>
+         </li>
+       </ul>
+    <hr>  
+<!--beginarticle-->
+<pre>Hopefully the explanation that follows helps clarify what PRIVATE, PUBLIC
+and INTERFACE mean and do. From my understanding of things, I think there
+may have been some subtle inaccuracies in some of the discussions so far,
+so hopefully the following is helpful and if I've got something wrong, then
+by all means please point out the inaccuracies.
+
+
+   - When A links in B as *PRIVATE*, it is saying that A uses B in its
+   implementation, but B is not used in any part of A's public API. Any code
+   that makes calls into A would not need to refer directly to anything from
+   B. An example of this could be a networking library A which can be built to
+   use one of a number of different SSL libraries internally (which B
+   represents). A presents a unified interface for client code which does not
+   reference any of the internal SSL data structures or functions. Client code
+   would have no idea what SSL implementation (B) is being used by A, nor does
+   that client code need to care.
+   - When A links in B as *INTERFACE*, it is saying that A does not use B
+   in its implementation, but B is used in A's public API. Code that calls
+   into A may need to refer to things from B in order to make such calls. One
+   example of this is an interface library which simply forwards calls along
+   to another library but doesn't actually reference the objects on the way
+   through other than by a pointer or reference. Another example is where A is
+   defined in CMake as an interface library, meaning it has no actual
+   implementation itself, it is effectively just a collection of other
+   libraries (I'm probably over-simplifying here, but you get the picture).
+   - When A links in B as *PUBLIC*, it is essentially a combination of
+   PRIVATE and INTERFACE. It says that A uses B in its implementation and B is
+   also used in A's public API.
+
+
+Consider first what this means for include search paths. If something links
+against A, it will also need any include search paths from B if B is in A's
+public API. Thus, if A links in B either as PUBLIC or INTERFACE, then any
+header search paths defined for target B will also apply to anything that
+links to A. Any PRIVATE header search path for B will NOT be carried
+through to anything that links only to A. The target_include_directories()
+command handles this. The situation with compile flags is analogously
+handled with target_compile_definitions() and target_compile_options().
+
+Now consider the situation for the actual libraries involved. If A is a
+shared library, then A will have encoded into it a dependency on B. This
+information can be inspected with tools like ldd on Linux, otool on Mac and
+something like Dependency Walker (a.k.a. depends.exe) on Windows. If other
+code links directly to A, then it also will have encoded into it a
+dependency on A. It will not, however, have a dependency on B unless A
+links in B as PUBLIC or INTERFACE. So far, so good. If, however, A is a
+static library, the situation changes. Static libraries do not carry
+information about other libraries they depend on. For this reason, when A
+links in B as PRIVATE and another target C links in A, CMake will still add
+B to the list of libraries to be linked for C because parts of B are needed
+by A, but A itself doesn't have that dependency encoded into it. So even
+though B is an internal implementation detail of A, C still needs B added
+to the linker command, which CMake conveniently handles for you.
+
+If you were paying careful attention, you would have noticed that when A
+links in B as PRIVATE, the include directories of B never propagate to
+something linking to A, but if A is a static library, then the *linking* of
+B behaves as though the relationship was PUBLIC. This
+PRIVATE-becomes-PUBLIC behaviour for static libraries only applies to the
+*linking*, not to the other dependencies (compiler options/flags and
+include search paths). The upshot of all this is that if you select
+PRIVATE, PUBLIC or INTERFACE based on the explanations in the dot points
+above, then CMake will ensure dependencies propagate through to where they
+are required, regardless of whether libraries are static or shared. This
+does, of course, rely on you the developer not missing any dependencies or
+specifying the wrong PRIVATE/PUBLIC/INTERFACE relationship.
+
+As a final note, if you call target_link_libraries() and do not specify any
+of PRIVATE, PUBLIC or INTERFACE, you may be tempted to believe that it will
+be treated as PUBLIC. The situation is actually more complicated than that
+though. It may be treated as PUBLIC or PRIVATE, depending on what other
+target_link_library() calls and/or target property manipulations have been
+performed. The documentation for target_link_libraries() talks a bit about
+this, but you have to go digging into the documentation for the target
+properties it mentions to get an understanding of what circumstances lead
+to PRIVATE or PUBLIC behaviour.
+
+Hope that helps clarify some things. Sorry if this has gone off on a
+tangent from the original enquiry, I'm coming in late to this thread.
+
+
+On Wed, May 11, 2016 at 8:33 PM, iosif neitzke &lt;
+<a href="http://public.kitware.com/mailman/listinfo/cmake">iosif.neitzke+cmake at gmail.com</a>&gt; wrote:
+
+&gt;<i> &gt;&gt; I *think* that these public/private rules behave a bit differently
+</i>&gt;<i> &gt;&gt; for static libraries than they do for shared ones.
+</i>&gt;<i>
+</i>&gt;<i> They do.  Assuming main calls a() and b() defined in A_lib and B_lib
+</i>&gt;<i> respectively, for:
+</i>&gt;<i> add_library(A_lib STATIC a.c)
+</i>&gt;<i> add_library(B_lib STATIC b.c)
+</i>&gt;<i> target_link_libraries(A_lib PRIVATE B_lib)
+</i>&gt;<i> add_executable(main main.c)
+</i>&gt;<i> target_link_libraries(main A_lib)
+</i>&gt;<i>
+</i>&gt;<i> The PRIVATE in "target_link_libraries(A_lib PRIVATE B_lib)" is
+</i>&gt;<i> useless.  It is the same as writing "target_link_libraries(A_lib
+</i>&gt;<i> PUBLIC B_lib)", only more confusing to the reader. Static libraries
+</i>&gt;<i> always link to their dependencies publically.
+</i>&gt;<i>
+</i>&gt;<i>
+</i>&gt;<i> <a href="https://cmake.org/cmake/help/v3.5/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents">https://cmake.org/cmake/help/v3.5/command/target_link_libraries.html#libraries-for-a-target-and-or-its-dependents</a>
+</i>&gt;<i>
+</i>&gt;<i> However, if you change A_lib to be a shared library with
+</i>&gt;<i> "add_library(A_lib SHARED a.c)" and left the rest of the code the
+</i>&gt;<i> same, you would now get link errors for main not able to find b(),
+</i>&gt;<i> because A_lib now does not pass on its dependency on B, it hides it
+</i>&gt;<i> from main.   Change the last line to "target_link_libraries(main A_lib
+</i>&gt;<i> B_lib)" and main builds again.
+</i>&gt;<i> --
+</i>&gt;<i>
+</i>&gt;<i> Powered by www.kitware.com
+</i>&gt;<i>
+</i>&gt;<i> Please keep messages on-topic and check the CMake FAQ at:
+</i>&gt;<i> <a href="http://www.cmake.org/Wiki/CMake_FAQ">http://www.cmake.org/Wiki/CMake_FAQ</a>
+</i>&gt;<i>
+</i>&gt;<i> Kitware offers various services to support the CMake community. For more
+</i>&gt;<i> information on each offering, please visit:
+</i>&gt;<i>
+</i>&gt;<i> CMake Support: <a href="http://cmake.org/cmake/help/support.html">http://cmake.org/cmake/help/support.html</a>
+</i>&gt;<i> CMake Consulting: <a href="http://cmake.org/cmake/help/consulting.html">http://cmake.org/cmake/help/consulting.html</a>
+</i>&gt;<i> CMake Training Courses: <a href="http://cmake.org/cmake/help/training.html">http://cmake.org/cmake/help/training.html</a>
+</i>&gt;<i>
+</i>&gt;<i> Visit other Kitware open-source projects at
+</i>&gt;<i> <a href="http://www.kitware.com/opensource/opensource.html">http://www.kitware.com/opensource/opensource.html</a>
+</i>&gt;<i>
+</i>&gt;<i> Follow this link to subscribe/unsubscribe:
+</i>&gt;<i> <a href="http://public.kitware.com/mailman/listinfo/cmake">http://public.kitware.com/mailman/listinfo/cmake</a>
+</i>&gt;<i>
+</i>
+
+
+-- 
+Craig Scott
+Melbourne, Australia
+<a href="http://crascit.com/">http://crascit.com</a>
+-------------- next part --------------
+An HTML attachment was scrubbed...
+URL: &lt;<a href="http://public.kitware.com/pipermail/cmake/attachments/20160511/e69cbd1e/attachment-0001.html">http://public.kitware.com/pipermail/cmake/attachments/20160511/e69cbd1e/attachment-0001.html</a>&gt;
+</pre>
+
+
+<!--endarticle-->
+    <hr>
+    <p></p><ul>
+        <!--threads-->
+	<li>Previous message: <a href="https://cmake.org/pipermail/cmake/2016-May/063399.html">[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries
+</a></li>
+	<li>Next message: <a href="https://cmake.org/pipermail/cmake/2016-May/063401.html">[CMake] Difference between PRIVATE and PUBLIC with	target_link_libraries
+</a></li>
+         <li> <b>Messages sorted by:</b> 
+              <a href="https://cmake.org/pipermail/cmake/2016-May/date.html#63400">[ date ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/thread.html#63400">[ thread ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/subject.html#63400">[ subject ]</a>
+              <a href="https://cmake.org/pipermail/cmake/2016-May/author.html#63400">[ author ]</a>
+         </li>
+       </ul>
+
+<hr>
+<a href="http://public.kitware.com/mailman/listinfo/cmake">More information about the CMake
+mailing list</a><br>
+
+</body></html>
