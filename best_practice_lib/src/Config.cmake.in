@@ -40,6 +40,10 @@ endif()
 include(CMakeFindDependencyMacro)
 set(${CMAKE_FIND_PACKAGE_NAME}_comps ${comps})
 if(Math IN_LIST comps)
+    # Warn: find_package/include(..) do not introduce new scope, if in any of following command
+    # , variables in current file, such as `comp` is changed to a new value, it will change
+    # value in current file. This can be very confusing. Better to use more specific variable
+    # names to avoid this situation
     find_dependency(foonathan_memory)
 endif()
 
